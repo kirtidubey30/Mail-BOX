@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 const Compose = () => {
   const userEmail = localStorage.getItem("email");
   const [intialVal, setIntialVal] = useState([]);
@@ -41,14 +42,19 @@ const Compose = () => {
       if (res.ok) {
         res.json().then((data) => {
           console.log("data after email sent =", data);
+          toast("Email Sent SuccessFully");
           setEmaildata({ ...emaildata, message: "", to: "" });
         });
       } else {
         res.json().then((data) => {
           console.log("Err occured", data.error.message);
           window.alert(data.error.message);
+          toast(data.error.message);
         });
       }
+      setTimeout(() => {
+        toast.dismiss();
+      }, 500);
     });
   };
   if (!localStorage.getItem("email")) {
@@ -56,6 +62,7 @@ const Compose = () => {
   } else {
     return (
       <div className="w-[70%] m-auto left-17rem absolute top-2rem">
+        <ToastContainer position="top-right" reverseOrder={false} />
         <div>
           <label
             htmlFor="email"

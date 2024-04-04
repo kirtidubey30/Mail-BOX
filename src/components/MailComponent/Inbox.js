@@ -1,21 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import EmailDetail from "./EmailDetail";
+import { ToastContainer, toast } from "react-toastify";
 
 function Inbox() {
   const [emails, setEmails] = useState([]);
-  // Add this useEffect hook at the end of your component
+
   useEffect(() => {
-    fetchData(); // Refetch data after emails state is updated
-  }, []); // Trigger refetch when emails state changes
+    fetchData();
+  }, []);
 
   const fetchData = () => {
     fetch("https://mailbox-9ba1a-default-rtdb.firebaseio.com/email.json").then(
       (res) => {
         if (res.ok) {
           res.json().then((data) => {
-            console.log("data fetched succesfully", data);
+            for (const key in data) {
+              data[key].id = key;
+            }
+
             const emailData = Object.values(data);
+            for (const key in data) {
+              data[key].id = key;
+            }
             setEmails(emailData);
           });
         } else {
@@ -28,9 +35,6 @@ function Inbox() {
     );
   };
   const userEmail = localStorage.getItem("email");
-  useEffect(() => {
-    console.log("val of email from Inbox.js =", emails);
-  }, [emails]);
 
   const handleMailState = (emailId) => {
     const emailIndex = emails.findIndex((email) => emailId === email.id);
@@ -67,57 +71,38 @@ function Inbox() {
   const handleEmailClick = (email) => {
     setSelectedEmail(email); // Set selected email data
   };
-  useEffect(() => {
-    console.log("selected val of email=", selectedEmail);
-  }, [selectedEmail]);
-  // Close email detail view
-  const closeEmailDetail = () => {
-    setSelectedEmail(""); // Clear selected email data
-  };
-  const handleOnDelete = (emailIndexToDelete) => {
-    if (emailIndexToDelete < 0 || emailIndexToDelete >= emails.length) {
-      console.error("Invalid email index:", emailIndexToDelete);
-      return;
-    }
 
-    // Create a copy of the emails array without the email to delete
-    const updatedEmails = [...emails];
-    updatedEmails.splice(emailIndexToDelete, 1);
-
-    // Update the state with the modified emails array
-    setEmails(updatedEmails);
-
-    // Send DELETE request to remove the email from the server
-    // fetch(
-    //   `https://mailbox-9ba1a-default-rtdb.firebaseio.com/email/${emailIdToDelete}.json`,
-    //   {
-    //     method: "DELETE",
-    //   }
-    // ).then((res) => {
-    //   if (!res.ok) {
-    //     res.json().then((data) => {
-    //       console.log("Err occurred", data.error.message);
-    //       window.alert(data.error.message);
-    //     });
-    //   } else {
-    //     // If deletion was successful, update the state to remove the deleted email
-    //     const updatedEmails = [...emails];
-    //     updatedEmails.splice(emailIndexToDelete, 1);
-    //     setEmails(updatedEmails);
-    //   }
-    // });
+  const handleOnDelete = (id) => {
+    fetch(
+      `https://mailbox-9ba1a-default-rtdb.firebaseio.com/email/${id}.json`,
+      {
+        method: "DELETE",
+      }
+    ).then((res) => {
+      if (res.ok) {
+        res.json().then((data) => {
+          toast.dismis();
+          toast("Data deleted Successfully");
+          fetchData();
+        });
+      } else {
+        res.json().then((data) => {
+          console.log("Err occurred", data.error.message);
+          window.alert(data.error.message);
+        });
+      }
+      setTimeout(() => {
+        toast.dismis();
+      }, 500);
+    });
   };
 
   return (
     <Link to="/inbox">
       <div className="flex flex-col flex-1 overflow-hidden">
+        <ToastContainer position="top-right" />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
-          {selectedEmail && (
-            <EmailDetail
-              selectedEmail={selectedEmail}
-              closeEmail={closeEmailDetail}
-            />
-          )}
+          {selectedEmail && <EmailDetail selectedEmail={selectedEmail} />}
           <div className="absolute container left-17rem mx-auto px-6 py-8 top-0 w-[70%]">
             <div className="flex flex-col">
               <div className="py-2 -my-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
@@ -147,7 +132,7 @@ function Inbox() {
                     <tbody className="bg-white">
                       {emails
                         .filter((mail) => mail.to === userEmail)
-                        .map((email, index) => (
+                        .map((email) => (
                           <tr
                             key={email.id}
                             onClick={() => handleMailState(email?.id)}
@@ -189,7 +174,7 @@ function Inbox() {
                               </span> */}
                               <button
                                 className="bg-red-100 px-2 rounded-full"
-                                onClick={() => handleOnDelete(index)}
+                                onClick={() => handleOnDelete(email?.id)}
                               >
                                 Delete
                               </button>

@@ -22,9 +22,6 @@ function Sent() {
   }, []);
   const [emails, setEmails] = useState([]);
   const userEmail = localStorage.getItem("email");
-  useEffect(() => {
-    console.log("val of email from Sent.js =", emails);
-  }, [emails]);
   return (
     <Link to="/sent">
       <div className="flex flex-col flex-1 overflow-hidden">

@@ -1,8 +1,53 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 function Header() {
   const userEmail = localStorage.getItem("email");
+  const [unreadEmailCount, setUnreadEmailCount] = useState(0);
+  useEffect(() => {
+    const fetchData = () => {
+      fetch(
+        "https://mailbox-9ba1a-default-rtdb.firebaseio.com/email.json"
+      ).then((res) => {
+        if (res.ok) {
+          res.json().then((data) => {
+            console.log("data fetched succesfully", data);
+            for (const key in data) {
+              data[key].id = key;
+            }
+          
+            const emailData = Object.values(data).filter(
+              (val) => val.to === userEmail
+            );
+           
+            for (const key in emailData) {
+              if (emailData[key].isRead === false) {
+                setUnreadEmailCount(unreadEmailCount + 1);
+              } else {
+                setUnreadEmailCount(0);
+              }
+            }
+          });
+        } else {
+          res.json().then((data) => {
+            console.log("Err Occurred : ", data.error.message);
+            window.alert(data.error.data.message);
+          });
+        }
+      });
+    };
+    fetchData();
+    const interval = setInterval(fetchData, 2000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+  const handleLogOut = (event) => {
+    event.preventDefault();
+    localStorage.setItem("email", "");
+    localStorage.setItem("token", "");
+    localStorage.setItem("isLoggedIn", "");
+  };
   return (
     <div className="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-gray-50 text-gray-800">
       <div className="fixed flex flex-col top-0 left-0 w-64 bg-white h-full border-r">
@@ -105,7 +150,7 @@ function Header() {
             </li>
             <li>
               <Link
-                to="/unread"
+                to="/inbox"
                 className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6"
               >
                 <span className="inline-flex justify-center items-center ml-4">
@@ -128,7 +173,7 @@ function Header() {
                   UnRead
                 </span>
                 <span className="px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-red-500 bg-red-50 rounded-full">
-                  12
+                  {unreadEmailCount}
                 </span>
               </Link>
             </li>
@@ -143,7 +188,7 @@ function Header() {
 
             <li>
               <Link
-                to="/logout"
+                to="/login"
                 className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6"
               >
                 <span className="inline-flex justify-center items-center ml-4">
@@ -162,7 +207,10 @@ function Header() {
                     ></path>
                   </svg>
                 </span>
-                <span className="ml-2 text-sm tracking-wide truncate">
+                <span
+                  className="ml-2 text-sm tracking-wide truncate"
+                  onClick={handleLogOut}
+                >
                   Logout
                 </span>
               </Link>

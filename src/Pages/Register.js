@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-// import { Toaster, toast } from "react-hot-toast";
 import { ToastContainer, toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -37,7 +36,7 @@ const Register = () => {
           setLoading(false);
           toast("Registered successfully");
           navigate("/login");
-          console.log("data after succesfully post request=", data);
+
           window.location.href("/login");
         });
       } else {
