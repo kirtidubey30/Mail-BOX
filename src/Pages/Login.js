@@ -39,6 +39,7 @@ const Register = () => {
           navigate("/home");
           console.log("data after succesfully Loginned=", data);
           localStorage.setItem("token", data.idToken);
+          localStorage.setItem("email", data.email);
         });
       } else {
         response.json().then((data) => {
