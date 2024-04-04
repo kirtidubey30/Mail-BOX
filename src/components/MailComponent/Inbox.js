@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import EmailDetail from "./EmailDetail";
 
-function Sent() {
+function Inbox() {
   useEffect(() => {
     fetch("https://mailbox-9ba1a-default-rtdb.firebaseio.com/email.json").then(
       (res) => {
@@ -23,12 +24,62 @@ function Sent() {
   const [emails, setEmails] = useState([]);
   const userEmail = localStorage.getItem("email");
   useEffect(() => {
-    console.log("val of email from Sent.js =", emails);
+    console.log("val of email from Inbox.js =", emails);
   }, [emails]);
+
+  const handleMailState = (emailId) => {
+    const emailIndex = emails.findIndex((email) => emailId === email.id);
+    if (emailIndex !== -1) {
+      const updatedEmails = [...emails];
+      updatedEmails[emailIndex] = {
+        ...updatedEmails[emailIndex],
+        isRead: true,
+      };
+      setEmails(updatedEmails);
+
+      fetch(
+        `https://mailbox-9ba1a-default-rtdb.firebaseio.com/email/${emailId}.json`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            isRead: true,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      ).then((res) => {
+        if (!res.ok) {
+          res.json().then((data) => {
+            console.log("Err occured", data.error.message);
+            window.alert(data.error.message);
+          });
+        }
+      });
+    }
+  };
+  const [selectedEmail, setSelectedEmail] = useState(null);
+  const handleEmailClick = (email) => {
+    setSelectedEmail(email); // Set selected email data
+  };
+  useEffect(() => {
+    console.log("selected val of email=", selectedEmail);
+  }, [selectedEmail]);
+  // Close email detail view
+  const closeEmailDetail = () => {
+    setSelectedEmail(""); // Clear selected email data
+  };
+
   return (
-    <Link to="/sent">
+    <Link to="/inbox">
       <div className="flex flex-col flex-1 overflow-hidden">
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
+          {selectedEmail && (
+            <EmailDetail
+              selectedEmail={selectedEmail}
+              closeEmail={closeEmailDetail}
+            />
+          )}
           <div className="absolute container left-17rem mx-auto px-6 py-8 top-0 w-[70%]">
             <div className="flex flex-col">
               <div className="py-2 -my-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
@@ -54,16 +105,24 @@ function Sent() {
 
                     <tbody className="bg-white">
                       {emails
-                        .filter((mail) => mail.from === userEmail)
+                        .filter((mail) => mail.to === userEmail)
                         .map((email) => (
-                          <tr key={email.id}>
+                          <tr
+                            key={email.id}
+                            onClick={() => handleMailState(email?.id)}
+                          >
                             <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                               {email.from}
                             </td>
                             <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                               {email.to}
                             </td>
-                            <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                            <td
+                              className="px-6 py-4 whitespace-no-wrap border-b border-gray-200"
+                              onClick={() => {
+                                handleEmailClick(email);
+                              }}
+                            >
                               {email.message}
                             </td>
                             <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
@@ -91,4 +150,4 @@ function Sent() {
   );
 }
 
-export default Sent;
+export default Inbox;

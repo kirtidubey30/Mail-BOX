@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 const Compose = () => {
   const userEmail = localStorage.getItem("email");
+  const [intialVal, setIntialVal] = useState([]);
 
   useEffect(() => {
     fetch("https://mailbox-9ba1a-default-rtdb.firebaseio.com/email.json").then(
@@ -9,6 +10,7 @@ const Compose = () => {
         if (res.ok) {
           res.json().then((data) => {
             console.log("data fetched succesfully", data);
+            setIntialVal(data);
           });
         } else {
           res.json().then((data) => {
@@ -25,6 +27,7 @@ const Compose = () => {
     to: "",
     message: "",
     isRead: false,
+    id: intialVal.length + 1,
   });
 
   const compose = () => {
@@ -38,7 +41,7 @@ const Compose = () => {
       if (res.ok) {
         res.json().then((data) => {
           console.log("data after email sent =", data);
-          setEmaildata({ ...emaildata, message: "" });
+          setEmaildata({ ...emaildata, message: "", to: "" });
         });
       } else {
         res.json().then((data) => {
