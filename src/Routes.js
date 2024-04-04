@@ -4,6 +4,7 @@ import Login from "./Pages/Login";
 import Register from "./Pages/Register";
 import HomePage from "./Pages/HomePage";
 import Compose from "./components/MailComponent/Compose";
+import Sent from "./components/MailComponent/Sent";
 
 const AllRoutes = () => {
   return (
@@ -13,6 +14,7 @@ const AllRoutes = () => {
         <Route path="/login" element={<Login />}></Route>
         <Route path="/home" element={<HomePage />}></Route>
         <Route path="/compose" element={<Compose />}></Route>
+        <Route path="/sent" element={<Sent />}></Route>
       </Routes>
     </div>
   );

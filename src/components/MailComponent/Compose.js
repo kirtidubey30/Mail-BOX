@@ -52,7 +52,7 @@ const Compose = () => {
     return <Navigate to="/login" />;
   } else {
     return (
-      <div className="w-[70%] m-auto">
+      <div className="w-[70%] m-auto left-17rem absolute top-2rem">
         <div>
           <label
             htmlFor="email"
