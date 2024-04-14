@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
-
+import signupImage from "../../src/assets/mailBoxSignup.png";
 const Register = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -59,9 +59,12 @@ const Register = () => {
   return (
     <div>
       <ToastContainer position="top-right" reverseOrder={false} />
-      <section className="bg-gray-50 dark:bg-gray-900 mt-16">
-        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+      <section style={{ backgroundColor: "azure" }}>
+        <div className="flex  items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
           <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+            <h1 class=" font-bold md:text-2xl p-2.5 text-center headingMailBox">
+              Mail Box
+            </h1>
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                 Sign Up
@@ -152,6 +155,14 @@ const Register = () => {
                 </p>
               </form>
             </div>
+          </div>
+
+          <div className="image-container md:h-screen">
+            <img
+              src={signupImage}
+              alt="Signup"
+              className="w-full h-auto water-droplet"
+            />
           </div>
         </div>
       </section>

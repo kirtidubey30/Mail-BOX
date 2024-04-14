@@ -172,12 +172,12 @@ function Header() {
                 <span className="ml-2 text-sm tracking-wide truncate">
                   UnRead
                 </span>
-                <span className="px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-red-500 bg-red-50 rounded-full">
-                  {unreadEmailCount}
-                </span>
+              
               </Link>
             </li>
-
+            {/* <span className="px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-red-500 bg-red-50 rounded-full">
+                  {unreadEmailCount}
+                </span> */}
             <li className="px-5">
               <div className="flex flex-row items-center h-8">
                 <div className="text-sm font-light tracking-wide text-gray-500">
